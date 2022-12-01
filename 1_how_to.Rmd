@@ -1,0 +1,82 @@
+---
+title: "Using the acs .rds files"
+author: "Chirag J Patel"
+date: "12/1/2022"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+# How to use the Census ACS 5 year .rds files
+
+
+```{r}
+library(tidycensus)
+library(tidyverse)
+directory <- 'out'
+variables <- load_variables(
+  year=2020,
+  dataset = c("acs5"),
+  cache = FALSE
+) 
+variables <- variables %>% mutate(tablename=sapply(strsplit(variables$name, "\\_"), function(arr) {arr[[1]]})) # comprehensive listing of all variables available in the acs 5 year
+
+```
+
+# Stitch together the .rds files in a directory 
+
+- See ehec_candidates.R  for more information 
+
+```{r list rds files}
+acs_files <- list.files(directory)
+acs_table <- map(acs_files, ~read_rds(file=file.path(directory,.))) %>% bind_rows() # sf file
+```
+
+# Derived data 
+
+- Derived data are rolled up to percentages (see file: ehec_candidates.R)
+- begin with column character "d"
+
+```{r derived data}
+acs_table %>% select(starts_with("d")) %>% head()
+```
+
+
+```{r median income}
+acs_table %>% ggplot(aes(d_median_income)) + geom_histogram() + facet_wrap(vars(state), nrow = 2)
+
+acs_table %>% select(d_median_income, NAME) %>% filter(d_median_income > 200000)
+
+```
+
+# Simple correlations 
+- cognitive impairment for individuals aged over 65 across all states vs. percent who are living under poverty of the older population
+
+```{r}
+acs_table %>% select(d_cognitive_female_over65_percentage, d_percent_older_under_poverty) %>% ggplot(aes(d_percent_older_under_poverty,d_cognitive_female_over65_percentage)) + geom_point(alpha=.1)
+
+acs_table %>% select(d_unemployed_percentage, d_median_income) %>% ggplot(aes(d_unemployed_percentage,d_median_income)) + geom_point(alpha=.1)
+
+```
+
+# PLACES 2020
+
+https://www.cdc.gov/places/index.html
+Consists of small-area (census tract) estimates of prevalence
+
+
+```{r places merge}
+places <- read_csv("./PLACES__Local_Data_for_Better_Health__Census_Tract_Data_2022_release.csv")
+unique(places$Measure)
+
+p_wide <- places %>% select(LocationName, MeasureId, Data_Value) %>% pivot_wider(names_from=MeasureId, values_from = Data_Value) # make in wide format, disease prevalence in each column
+
+acs_table <- acs_table %>% left_join(p_wide, by=c("GEOID"="LocationName"))
+
+acs_table %>% select(STROKE, d_cognitive_male_over65_percentage) %>% ggplot(aes(d_cognitive_male_over65_percentage,STROKE)) + geom_point()
+
+acs_table %>% select(GHLTH, d_cognitive_male_over65_percentage) %>% ggplot(aes(d_cognitive_male_over65_percentage,GHLTH)) + geom_point()
+
+
+```
