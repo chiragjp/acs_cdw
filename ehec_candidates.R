@@ -6,8 +6,8 @@
 library(tidyverse)
 library(tidycensus)
 library(getopt)
+source(apikey.R)
 
-api_key <- "7bea2bd290231fbe8e72313e72b7957136ae6e35"
 data(fips_codes)
 
 spec = matrix(c(

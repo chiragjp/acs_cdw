@@ -67,7 +67,7 @@ Consists of small-area (census tract) estimates of prevalence
 
 
 ```{r places merge}
-places <- read_csv("./PLACES__Local_Data_for_Better_Health__Census_Tract_Data_2022_release.csv")
+places <- read_csv("./PLACES__Local_Data_for_Better_Health__Census_Tract_Data_2022_release.csv.zip")
 unique(places$Measure)
 
 p_wide <- places %>% select(LocationName, MeasureId, Data_Value) %>% pivot_wider(names_from=MeasureId, values_from = Data_Value) # make in wide format, disease prevalence in each column
