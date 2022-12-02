@@ -6,20 +6,25 @@
 library(tidyverse)
 library(tidycensus)
 library(getopt)
-source(apikey.R)
+source("api_key.R") # not committed
 
 data(fips_codes)
-
+TEST <- F
 spec = matrix(c(
   'state', 's', 1, "character",
   'year'  , 'y', 1, "integer"
 ), byrow=TRUE, ncol=4)
 opt = getopt(spec)
 
-state <- opt$state
-#state <- "CA" ## param --> next NV, OR, AZ
-year <- opt$year
-#year <- 2020 ## param
+state <- "";year <- NA
+if(TEST) {
+  state <- "CA"
+  year <- 2020
+} else {
+  state <- opt$state
+  year <- opt$year
+}
+
 
 
 directoryout <- 'out' # can also be a param
@@ -45,8 +50,9 @@ acs_pivot_wider <- function(d) {
   d %>% select(-c(label, concept)) %>% pivot_wider(names_from = variable, values_from = c(estimate, moe))
 }
 
-population <- get_acs_table_tracts_for_state_with_geom(state, "B01003", year=year) ## with geometry
+cat(sprintf("ACS5;state:%s;year:%i\n", state, year ))
 
+population <- get_acs_table_tracts_for_state_with_geom(state, "B01003", year=year) ## with geometry
 big_table <- population %>% select(-variable) %>% rename(population_size=estimate, population_size_moe=moe)
 
 ## 1. Unemployment - Percentage of persons aged 16 years or older in the labor force who  are unemployed (and actively seeking work) (B23025) 
@@ -169,9 +175,37 @@ sex_by_age_ild <- sex_by_age_ild %>% mutate(d_inddifficulty_female_over65_percen
 big_table <- big_table %>% left_join(sex_by_age_ild %>% select(-NAME), by="GEOID")
 
 ## 17. Age by disability status by health coverage (B18135)
-# skip for now
+# skip for now, overlap with previous
+
 ## 18. Women who had a birth  B13002
-# skip for now
+women_birth <- get_acs_table_tracts_for_state_with_geom(state, table_name = "B13002", year=year, geometry = FALSE) %>% acs_pivot_wider()
+## keep as total counts
+women_birth <- women_birth %>% mutate(d_total_women_with_birth=estimate_B13002_001)
+women_birth <- women_birth %>% mutate(d_total_births_last_year=estimate_B13002_002)
+women_birth <- women_birth %>% mutate(d_total_births_married_last_year=estimate_B13002_003)
+women_birth <- women_birth %>% mutate(d_total_births_married1519_last_year=estimate_B13002_004)
+women_birth <- women_birth %>% mutate(d_total_births_married2034_last_year=estimate_B13002_005)
+women_birth <- women_birth %>% mutate(d_total_births_married3550_last_year=estimate_B13002_006)
+
+women_birth <- women_birth %>% mutate(d_total_births_unmarried_last_year=estimate_B13002_007)
+women_birth <- women_birth %>% mutate(d_total_births_unmarried1519_last_year=estimate_B13002_008)
+women_birth <- women_birth %>% mutate(d_total_births_unmarried2034_last_year=estimate_B13002_009)
+women_birth <- women_birth %>% mutate(d_total_births_unmarried3550_last_year=estimate_B13002_010)
+
+women_birth <- women_birth %>% mutate(d_total_no_births_last_year=estimate_B13002_011)
+women_birth <- women_birth %>% mutate(d_total_no_births_married_last_year=estimate_B13002_012)
+women_birth <- women_birth %>% mutate(d_total_no_births_married1519_last_year=estimate_B13002_013)
+women_birth <- women_birth %>% mutate(d_total_no_births_married2034_last_year=estimate_B13002_014)
+women_birth <- women_birth %>% mutate(d_total_no_births_married3550_last_year=estimate_B13002_015)
+
+women_birth <- women_birth %>% mutate(d_total_no_births_unmarried_last_year=estimate_B13002_016)
+women_birth <- women_birth %>% mutate(d_total_no_births_unmarried1519_last_year=estimate_B13002_017)
+women_birth <- women_birth %>% mutate(d_total_no_births_unmarried2034_last_year=estimate_B13002_018)
+women_birth <- women_birth %>% mutate(d_total_no_births_unmarried3550_last_year=estimate_B13002_019)
+
+
+big_table <- big_table %>% left_join(women_birth %>% select(-NAME), by="GEOID")
+
 
 ## 19. Race (B02001)
 race <- get_acs_table_tracts_for_state_with_geom(state, table_name = "B02001", year=year, geometry = FALSE) %>% acs_pivot_wider()
@@ -187,7 +221,17 @@ big_table <- big_table %>% left_join(race %>% select(-NAME), by="GEOID")
 
 ## 20. house heating and fuel
 heating <- get_acs_table_tracts_for_state_with_geom(state, "B25040", year=year, geometry = FALSE) %>% acs_pivot_wider()
+heating <- heating %>% mutate(d_energy_gas_percentage=estimate_B25040_002/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_bottledgas_percentage=estimate_B25040_003/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_electricity_percentage=estimate_B25040_004/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_fueloil_percentage=estimate_B25040_005/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_coal_percentage=estimate_B25040_006/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_wood_percentage=estimate_B25040_007/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_solar_percentage=estimate_B25040_008/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_otherfuel_percentage=estimate_B25040_009/estimate_B25040_001)
+heating <- heating %>% mutate(d_energy_nofuel_percentage=estimate_B25040_010/estimate_B25040_001)
 big_table <- big_table %>% left_join(heating %>% select(-NAME), by="GEOID")
 
+cat(sprintf("ACS5;state:%s;year:%i... done!\n", state, year ))
 big_table <- big_table %>% mutate(state=state, year=year)
 big_table %>% write_rds(file=pathout)
