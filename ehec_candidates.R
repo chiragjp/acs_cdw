@@ -1,7 +1,9 @@
 ## Chirag J Patel
 ## 11/30/22
 
-### CDW ACS - downloads candidate data for the CDW (by state, year of ACS5 data)
+
+## CDW ACS - downloads candidate data for the CDW (by state, year of ACS5 data)
+## candidates chosen based on the sociodeprivation index (see Lakhani NG 2019) 
 
 library(tidyverse)
 library(tidycensus)
