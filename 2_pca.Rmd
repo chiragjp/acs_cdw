@@ -1,6 +1,8 @@
 ---
 title: "PCA and the Deprivation Index"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 
@@ -42,7 +44,7 @@ p1 <- ggplot(acs_2, aes(d_median_income, pc_1))
 p1 <- p1 + geom_point(alpha=.1)
 p2 <- ggplot(acs_2, aes(d_education_less_hs_over_25_percentage, pc_1))
 p2 <- p2 + geom_point(alpha=.1)
-#p3 <- ggplot(acs_2, aes(d_total_male_over_age_65, composite_index)) + geom_point(alpha=.1)
+p3 <- ggplot(acs_2, aes(d_total_male_over_age_65, composite_index)) + geom_point(alpha=.1)
 
 cowplot::plot_grid(p1, p2, p3, nrow=1)
 
