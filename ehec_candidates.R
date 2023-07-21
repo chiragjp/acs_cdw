@@ -14,23 +14,22 @@ data(fips_codes)
 TEST <- F
 spec = matrix(c(
   'state', 's', 1, "character",
-  'year'  , 'y', 1, "integer"
+  'year'  , 'y', 1, "integer", 
+  'geotype', 'g', 1, 'character'
 ), byrow=TRUE, ncol=4)
 opt = getopt(spec)
 
-state <- "";year <- NA
-if(TEST) {
-  state <- "CA"
-  year <- 2020
-} else {
+state <- "CA";year <- 2020; geotype <- "tract"
+if(!TEST) {
   state <- opt$state
   year <- opt$year
+  geotype <- opt$geotype
 }
 
 
 
 directoryout <- 'out' # can also be a param
-fileoutname <- sprintf('%s_%i_acs5.rds', state, year)
+fileoutname <- sprintf('%s_%i_%s_acs5.rds', state, year, geotype)
 pathout <- file.path(directoryout, fileoutname)
 
 ## get the table with the variables and the table names
@@ -43,7 +42,7 @@ variables <- variables %>% mutate(tablename=sapply(strsplit(variables$name, "\\_
 
 ## get population data 
 get_acs_table_tracts_for_state_with_geom <- function(state, table_name, year, geometry=TRUE) {
-  tab <- get_acs("tract", year=year, key=api_key, state = state, table = table_name, geometry = geometry) ## gets all the variables for a state and census tract
+  tab <- get_acs(geotype, year=year, key=api_key, state = state, table = table_name, geometry = geometry) ## gets all the variables for a state and census tract
   ## merge in the variable name
   tab %>% left_join(variables  %>% select(name, label, concept), by=c("variable"="name"))
 }
