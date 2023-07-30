@@ -9,6 +9,6 @@ data(fips_codes)
 states <- unique(fips_codes$state)
 
 for(state in states) {
-  cmd <- sprintf("Rscript ehec_candidates.R -s %s -y 2020 -g tract\n", state)
+  cmd <- sprintf("Rscript ehec_candidates.R -s %s -y 2015 -g tract\n", state)
   cat(cmd)
 }
