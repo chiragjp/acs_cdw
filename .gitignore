@@ -1,3 +1,6 @@
 api_key.R
 .DS_Store
 .Rhistory
+out/ehe_trends_acs_places.Rdata
+out/ehe_acs_tract.rds
+out/ehe_acs_counties.rds
