@@ -4,3 +4,4 @@ api_key.R
 out/ehe_trends_acs_places.Rdata
 out/ehe_acs_tract.rds
 out/ehe_acs_counties.rds
+out/ehe_places_catalog_2014_2022.rds

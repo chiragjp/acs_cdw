@@ -1,0 +1,38 @@
+---
+title: "EHE ECE Census"
+author: "Chirag Patel"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+
+# set the path pointing to the RDS files storing event catalogs
+
+events_catalog_file_path <- file.path("~/Dropbox (HMS)/events_geographical_extent",
+                                      # aggregate summary by event type for the entire study period
+                                      "us_events_by_tracts_by_year_by_type_2014_2022.csv") 
+
+
+events_catalog_csv <- read_csv(events_catalog_file_path)
+
+
+## now get the Census data 
+#ehe_acs_tract <- readRDS('~/Dropbox (HMS)/projects/acs_cdw/out/ehe_acs_tract.rds')
+load('~/Dropbox (HMS)/projects/acs_cdw/out/ehe_trends_acs_places.Rdata')
+
+ehe_acs_places_catalog <- acs_places_by_tract |> right_join(events_catalog_csv, by="GEOID")
+
+saveRDS(ehe_acs_places_catalog, file="ehe_places_catalog_2014_2022.rds")
+```
+
+
+```{r}
+ehe_acs_places_catalog <- readRDS('./out/ehe_places_catalog_2014_2022.rds')
+```
