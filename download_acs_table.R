@@ -10,7 +10,7 @@
 library(tidyverse)
 library(tidycensus)
 library(getopt)
-api_key <- "7bea2bd290231fbe8e72313e72b7957136ae6e35"
+source("api_key.R") # not committed
 #data(fips_codes)
 
 spec = matrix(c(

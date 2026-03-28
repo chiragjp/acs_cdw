@@ -1,57 +1,18 @@
-Rscript ehec_candidates.R -s AL -y 2020 -g county
-Rscript ehec_candidates.R -s AK -y 2020 -g county
-Rscript ehec_candidates.R -s AZ -y 2020 -g county
-Rscript ehec_candidates.R -s AR -y 2020 -g county
-Rscript ehec_candidates.R -s CA -y 2020 -g county
-Rscript ehec_candidates.R -s CO -y 2020 -g county
-Rscript ehec_candidates.R -s CT -y 2020 -g county
-Rscript ehec_candidates.R -s DE -y 2020 -g county
-Rscript ehec_candidates.R -s DC -y 2020 -g county
-Rscript ehec_candidates.R -s FL -y 2020 -g county
-Rscript ehec_candidates.R -s GA -y 2020 -g county
-Rscript ehec_candidates.R -s HI -y 2020 -g county
-Rscript ehec_candidates.R -s ID -y 2020 -g county
-Rscript ehec_candidates.R -s IL -y 2020 -g county
-Rscript ehec_candidates.R -s IN -y 2020 -g county
-Rscript ehec_candidates.R -s IA -y 2020 -g county
-Rscript ehec_candidates.R -s KS -y 2020 -g county
-Rscript ehec_candidates.R -s KY -y 2020 -g county
-Rscript ehec_candidates.R -s LA -y 2020 -g county
-Rscript ehec_candidates.R -s ME -y 2020 -g county
-Rscript ehec_candidates.R -s MD -y 2020 -g county
-Rscript ehec_candidates.R -s MA -y 2020 -g county
-Rscript ehec_candidates.R -s MI -y 2020 -g county
-Rscript ehec_candidates.R -s MN -y 2020 -g county
-Rscript ehec_candidates.R -s MS -y 2020 -g county
-Rscript ehec_candidates.R -s MO -y 2020 -g county
-Rscript ehec_candidates.R -s MT -y 2020 -g county
-Rscript ehec_candidates.R -s NE -y 2020 -g county
-Rscript ehec_candidates.R -s NV -y 2020 -g county
-Rscript ehec_candidates.R -s NH -y 2020 -g county
-Rscript ehec_candidates.R -s NJ -y 2020 -g county
-Rscript ehec_candidates.R -s NM -y 2020 -g county
-Rscript ehec_candidates.R -s NY -y 2020 -g county
-Rscript ehec_candidates.R -s NC -y 2020 -g county
-Rscript ehec_candidates.R -s ND -y 2020 -g county
-Rscript ehec_candidates.R -s OH -y 2020 -g county
-Rscript ehec_candidates.R -s OK -y 2020 -g county
-Rscript ehec_candidates.R -s OR -y 2020 -g county
-Rscript ehec_candidates.R -s PA -y 2020 -g county
-Rscript ehec_candidates.R -s RI -y 2020 -g county
-Rscript ehec_candidates.R -s SC -y 2020 -g county
-Rscript ehec_candidates.R -s SD -y 2020 -g county
-Rscript ehec_candidates.R -s TN -y 2020 -g county
-Rscript ehec_candidates.R -s TX -y 2020 -g county
-Rscript ehec_candidates.R -s UT -y 2020 -g county
-Rscript ehec_candidates.R -s VT -y 2020 -g county
-Rscript ehec_candidates.R -s VA -y 2020 -g county
-Rscript ehec_candidates.R -s WA -y 2020 -g county
-Rscript ehec_candidates.R -s WV -y 2020 -g county
-Rscript ehec_candidates.R -s WI -y 2020 -g county
-Rscript ehec_candidates.R -s WY -y 2020 -g county
-Rscript ehec_candidates.R -s AS -y 2020 -g county
-Rscript ehec_candidates.R -s GU -y 2020 -g county
-Rscript ehec_candidates.R -s MP -y 2020 -g county
-Rscript ehec_candidates.R -s PR -y 2020 -g county
-Rscript ehec_candidates.R -s UM -y 2020 -g county
-Rscript ehec_candidates.R -s VI -y 2020 -g county
+#!/bin/bash
+## Run ehec_candidates.R for all US states and territories
+## Usage: bash state_by_state.sh <year> <geotype>
+## Example: bash state_by_state.sh 2020 tract
+
+YEAR=${1:-2020}
+GEOTYPE=${2:-tract}
+
+STATES=(AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY AS GU MP PR UM VI)
+
+echo "Running ehec_candidates.R for ${#STATES[@]} states/territories (year=$YEAR, geotype=$GEOTYPE)"
+
+for STATE in "${STATES[@]}"; do
+  echo "--- $STATE ---"
+  Rscript ehec_candidates.R -s "$STATE" -y "$YEAR" -g "$GEOTYPE"
+done
+
+echo "Done."

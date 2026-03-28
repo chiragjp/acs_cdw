@@ -1,0 +1,47 @@
+---
+title: "Mapping Extreme Events to Census Tracts and CDC Places Data"
+author: "Chirag Patel and Pedram Fard"
+date: "2025-07-02"
+output: html_document
+---
+
+# Mapping Extreme Events to Census Tracts and CDC Places Data
+
+A number of complications can occur for vulnerable individuals and are exposed to extreme heat or cold events. Vulnerability can be defined as indiduals without access to resources, such as air conditioning (as documented in the .rmd), but also can include individuals who (non-exclusive list:
+
+- have a chronic kidney disease, as dehydration during a heat wave is a risk factor for decline,
+- cardiovascular disease, heat and cold stress may trigger events like myocardial infarction and stroke,
+- have a disability that under an extreme heat or cold event, may be impaired.
+
+This .rmd merges the GridEX data with CDC Places data to identify populations with these health-realted vulnerabilities.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+# EHE and ECE data for 2023
+```{r}
+Y2023_S201_T002_impacted_area_variables_intensity_tracts <- readRDS(url("https://dataverse.harvard.edu/api/access/datafile/10590042"))
+```
+
+
+# Join with CDC Places data for 2023
+
+PLACES Data: https://www.cdc.gov/places/index.html
+About the measurements: https://www.cdc.gov/places/measure-definitions/index.html
+
+```{r}
+places2023 <- read_csv("~/Downloads/PLACES__Census_Tract_Data__GIS_Friendly_Format___2023_release_20250702.csv")
+ # join with the ECE/EHE data
+places2023_ee <- places2023 |> inner_join(Y2023_S201_T002_impacted_area_variables_intensity_tracts, by=join_by(TractFIPS==GEOID))
+glimpse(places2023_ee)
+```
+
+
+# What Census Tracts had an ECE and EHE and had high levels of individuals 
+```{r}
+```

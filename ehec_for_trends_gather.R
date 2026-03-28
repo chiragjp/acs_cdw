@@ -1,21 +1,32 @@
-# Chirag 
+# Chirag
 # get data ready for demographic analysis
 # gather acs files in a directory
 # 7/30/23
 library(tidyverse)
 library(tidycensus)
+library(getopt)
+
+spec <- matrix(c(
+  'year', 'y', 2, "integer"
+), byrow = TRUE, ncol = 4)
+opt <- getopt(spec)
+year <- opt$year %||% 2020
 
 read_directory <- function(directory) {
-  acs_files <- list.files(directory)
+  acs_files <- list.files(directory, pattern = "\\.rds$")
+  if (length(acs_files) == 0) {
+    cat(sprintf("No RDS files found in %s\n", directory))
+    return(NULL)
+  }
   acs_table <- map(acs_files, ~read_rds(file=file.path(directory,.))) %>% bind_rows() # sf file
   acs_table
 }
 
 ## get counties
-directory <- './out/2020_county/'
+directory <- sprintf('./out/%d_county/', year)
 acs_by_county <- read_directory(directory)
 
-directory <- './out/2020/'
+directory <- sprintf('./out/%d/', year)
 acs_by_tract <- read_directory(directory)
 
 ## merge in places
